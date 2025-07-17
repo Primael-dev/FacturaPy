@@ -10,6 +10,11 @@ from functions.manipe import (
    
 )
 
+from functions.ajout import (
+   ajouter_client,
+   ajouter_produit 
+)
+
 
 #Menu principal
 def menu():
@@ -26,7 +31,8 @@ def choice(choix):
     elif choix == 2:
         CreateFacture()
     elif choix == 3:
-        print("Permet d’ajouter un nouveau produit au fichier Produits.")
+        # print("Permet d’ajouter un nouveau produit au fichier Produits.")
+        ajouter_produit()
     elif choix == 4:
         print("Quitter APK")
     else: 
