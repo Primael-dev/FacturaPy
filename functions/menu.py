@@ -3,6 +3,12 @@ import locale
 import time
 from fpdf import FPDF
 import os
+from functions.manipe import (
+    afficher_clients,
+    afficher_produits,
+    afficher_cartes_reduction,
+   
+)
 
 
 #Menu principal
@@ -28,11 +34,14 @@ def choice(choix):
 
 def rechoice(choix):
     if choix =="a":
-        print("afficher les clients")
+        # print("afficher les clients")
+        afficher_clients()
     elif choix == "b":
-        print("afficher les produits")
+        # print("afficher les produits")
+        afficher_produits()
     elif choix == "c":
-        print("Afficher les cartes de reduction")
+        # print("Afficher les cartes de reduction")
+        afficher_cartes_reduction()
     else:
         print("Entrée invalide")
 
