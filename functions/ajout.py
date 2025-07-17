@@ -27,26 +27,26 @@ def ajouter_produit():
     print("Produit ajouté avec succès !")
 
 
-def ajouter_client():
-    try:
-        clients = pd.read_excel("ExcelFiles/Clients.xlsx")
-    except FileNotFoundError:
-        clients = pd.DataFrame(columns=["code_client", "nom", "contact", "IFU"])
+# def ajouter_client():
+#     try:
+#         clients = pd.read_excel("ExcelFiles/Clients.xlsx")
+#     except FileNotFoundError:
+#         clients = pd.DataFrame(columns=["code_client", "nom", "contact", "IFU"])
 
-    print("\n=== AJOUT D’UN NOUVEAU CLIENT ===")
-    code_client = input("Code client (ex: C001) : ").strip().upper()
-    nom = input("Nom : ").strip()
-    contact = input("Contact : ").strip()
-    ifu = input("IFU (13 caractères) : ").strip()
+#     print("\n=== AJOUT D’UN NOUVEAU CLIENT ===")
+#     code_client = input("Code client (ex: C001) : ").strip().upper()
+#     nom = input("Nom : ").strip()
+#     contact = input("Contact : ").strip()
+#     ifu = input("IFU (13 caractères) : ").strip()
 
-    # Vérifier si le client existe déjà
-    existe = clients[(clients['code_client'] == code_client)]
-    if not existe.empty:
-        print("Ce client existe déjà !")
-        print(existe)
-        return
+#     # Vérifier si le client existe déjà
+#     existe = clients[(clients['code_client'] == code_client)]
+#     if not existe.empty:
+#         print("Ce client existe déjà !")
+#         print(existe)
+#         return
 
-    nouveau_client = pd.DataFrame([[code_client, nom, contact, ifu]], columns=clients.columns)
-    clients = pd.concat([clients, nouveau_client], ignore_index=True)
-    clients.to_excel("ExcelFiles/Clients.xlsx", index=False)
-    print("Client ajouté avec succès !")
+#     nouveau_client = pd.DataFrame([[code_client, nom, contact, ifu]], columns=clients.columns)
+#     clients = pd.concat([clients, nouveau_client], ignore_index=True)
+#     clients.to_excel("ExcelFiles/Clients.xlsx", index=False)
+#     print("Client ajouté avec succès !")
