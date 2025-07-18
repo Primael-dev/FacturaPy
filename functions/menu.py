@@ -3,6 +3,7 @@ import locale
 import time
 from fpdf import FPDF
 import os
+from functions.statistiques import generer_statistiques
 import pandas as pd
 from functions.manipe import (
     afficher_clients,
@@ -22,6 +23,8 @@ def menu():
     print("2-Générer une facture")
     print("3-Ajouter un produit")
     print("4-Quitter l'application")
+    print("5-Statistiques de ventes")
+
 
 def choice(choix):
     if choix == 1:
@@ -35,6 +38,8 @@ def choice(choix):
         ajouter_produit()
     elif choix == 4:
         print("Quitter APK")
+    elif choix == 5:
+        generer_statistiques()
     else: 
         print("Entrée invalide")
 
@@ -129,8 +134,9 @@ def creer_carte_reduction(code_client, montant_facture):
                                     columns=cartes.columns)
         cartes = pd.concat([cartes, nouvelle_carte], ignore_index=True)
         cartes.to_excel("ExcelFiles/CartesReduction.xlsx", index=False)
-        print(f"Carte de réduction créée ! Taux : {taux_reduction}%")
-
+        print("\n🎉 Félicitations ! 🎉")
+        print(f"Votre fidélité est récompensée : vous bénéficiez désormais d'une carte de réduction de {nouvelle_reduc}%.")
+        print("Elle sera valable automatiquement sur tous vos prochains achats.\n")
 
 def CreateFacture():
     try:
@@ -352,13 +358,34 @@ def CreateFacture():
     
     filename = f"Factures/Facture_{IdFacture}.pdf"
     pdf.output(filename)
-    
+
+    # Enregistrement des ventes dans stats-ventes.xlsx
+    ventes_path = "ExcelFiles/stats-ventes.xlsx"
+    date_facture = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ventes_lignes = []
+    for produit in produits_facture:
+        ventes_lignes.append({
+            "id_facture": IdFacture,
+            "date": date_facture,
+            "code_produit": produit['code_produit'],
+            "libelle": produit['libelle'],
+            "quantite": produit['quantite'],
+            "prix_unitaire": produit['prix_unitaire'],
+            "total": produit['total']
+        })
+    try:
+        ventes_df = pd.read_excel(ventes_path)
+    except Exception:
+        ventes_df = pd.DataFrame(columns=["id_facture", "date", "code_produit", "libelle", "quantite", "prix_unitaire", "total"])
+    ventes_df = pd.concat([ventes_df, pd.DataFrame(ventes_lignes)], ignore_index=True)
+    ventes_df.to_excel(ventes_path, index=False)
+
     print(f"\nFacture générée avec succès !")
     print(f"Fichier : {filename}")
     print(f"Montant TTC : {total_ttc:,.0f} FCFA")
     print(f"Nombre de produits : {nb_produits}")
-    
+
     if taux_reduction > 0:
         print(f"Remise appliquée : {taux_reduction}%")
-    
+
     return filename
