@@ -17,53 +17,62 @@ from functions.ajout import (
 )
 
 
-#Menu principal
 def menu():
-    print("1-Consulter un fichier")
-    print("2-Générer une facture")
-    print("3-Ajouter un produit")
-    print("4-Quitter l'application")
-    print("5-Statistiques de ventes")
+    """Affiche le menu principal"""
+    print("\n" + "="*40)
+    print("   APPLICATION DE FACTURATION")
+    print("="*40)
+    print("1 - Consulter un fichier")
+    print("2 - Générer une facture")
+    print("3 - Ajouter un produit")
+    print("4 - Statistiques de ventes")
+    print("5 - Quitter l'application")
+    print("="*40)
 
 
 def choice(choix):
+    """Traite le choix du menu principal"""
     if choix == 1:
-        print("a.Afficher les clients")
-        print("b.Afficher les produits")
-        print("c.Afficher les cartes de réduction")
+        print("\n--- CONSULTATION DES FICHIERS ---")
+        print("a - Afficher les clients")
+        print("b - Afficher les produits")
+        print("c - Afficher les cartes de réduction")
+        return True  # Indique qu'il faut demander un sous-choix
     elif choix == 2:
         CreateFacture()
     elif choix == 3:
-        # print("Permet d'ajouter un nouveau produit au fichier Produits.")
         ajouter_produit()
     elif choix == 4:
-        print("Quitter APK")
-    elif choix == 5:
         generer_statistiques()
+    elif choix == 5:
+        print("Au revoir ! 👋")
+        return False  # Indique la fin du programme
     else: 
-        print("Entrée invalide")
+        print("❌ Entrée invalide. Veuillez choisir un nombre entre 1 et 5.")
+    
+    return None  # Continue le programme normalement
+
 
 def rechoice(choix):
-    if choix =="a":
-        # print("afficher les clients")
+    """Traite le choix du sous-menu de consultation"""
+    if choix.lower() == "a":
         afficher_clients()
-    elif choix == "b":
-        # print("afficher les produits")
+    elif choix.lower() == "b":
         afficher_produits()
-    elif choix == "c":
-        # print("Afficher les cartes de reduction")
+    elif choix.lower() == "c":
         afficher_cartes_reduction()
     else:
-        print("Entrée invalide")
+        print("❌ Entrée invalide. Veuillez choisir 'a', 'b' ou 'c'.")
 
 
 def factureId():
+    """Génère un ID unique pour la facture"""
     timestamp = int(time.time())
     return f"{timestamp}"
 
 
 def nombre_en_lettres(nombre):
-    """Convertit un nombre en lettres (version simplifiée)"""
+    """Convertit un nombre en lettres (version simplifiée pour le français)"""
     unites = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"]
     dizaines = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante-dix", "quatre-vingt", "quatre-vingt-dix"]
     
@@ -91,7 +100,7 @@ def nombre_en_lettres(nombre):
         return result
     else:
         # Pour les nombres plus grands, version simplifiée
-        return f"{nombre} "
+        return f"{nombre}"
 
 
 def verifier_carte_reduction(code_client):
@@ -135,10 +144,12 @@ def creer_carte_reduction(code_client, montant_facture):
         cartes = pd.concat([cartes, nouvelle_carte], ignore_index=True)
         cartes.to_excel("ExcelFiles/CartesReduction.xlsx", index=False)
         print("\n🎉 Félicitations ! 🎉")
-        print(f"Votre fidélité est récompensée : vous bénéficiez désormais d'une carte de réduction de {nouvelle_reduc}%.")
+        print(f"Votre fidélité est récompensée : vous bénéficiez désormais d'une carte de réduction de {taux_reduction}%.")
         print("Elle sera valable automatiquement sur tous vos prochains achats.\n")
 
+
 def CreateFacture():
+    """Génère une nouvelle facture"""
     try:
         locale.setlocale(locale.LC_TIME, 'French_France.1252')
     except:
@@ -155,7 +166,7 @@ def CreateFacture():
         clients = pd.read_excel("ExcelFiles/Clients.xlsx")
         produits = pd.read_excel("ExcelFiles/Produits.xlsx")
     except FileNotFoundError as e:
-        print(f"Erreur : fichier manquant {e}")
+        print(f"❌ Erreur : fichier manquant {e}")
         return
     
     # Gestion du client
@@ -175,7 +186,7 @@ def CreateFacture():
     client = clients[clients['code_client'] == code_client]
     
     if client.empty:
-        print("Client non trouvé !")
+        print("❌ Client non trouvé !")
         return
     
     client_info = client.iloc[0]
@@ -195,13 +206,16 @@ def CreateFacture():
         
         produit = produits[produits['code_produit'] == code_produit]
         if produit.empty:
-            print("Produit non trouvé !")
+            print("❌ Produit non trouvé !")
             continue
         
         try:
             quantite = int(input("Quantité : "))
+            if quantite <= 0:
+                print("❌ La quantité doit être positive !")
+                continue
         except ValueError:
-            print("Quantité invalide !")
+            print("❌ Quantité invalide ! Entrez un nombre entier.")
             continue
         
         produit_info = produit.iloc[0]
@@ -217,10 +231,10 @@ def CreateFacture():
         })
         
         total_ht += total_produit
-        print(f"Produit ajouté : {produit_info['libelle']} x {quantite} = {total_produit} FCFA")
+        print(f"✅ Produit ajouté : {produit_info['libelle']} x {quantite} = {total_produit:,.0f} FCFA")
     
     if not produits_facture:
-        print("Aucun produit sélectionné !")
+        print("❌ Aucun produit sélectionné !")
         return
     
     # Vérifier la carte de réduction (seulement pour les clients existants)
@@ -268,7 +282,7 @@ def CreateFacture():
     
     pdf.ln(10)
     
-    # Tableau des produits - En-tête (SANS la colonne vide)
+    # Tableau des produits - En-tête
     pdf.set_font("Arial", "B", size=9)
     pdf.cell(15, 8, txt="N°", border=1, ln=0, align='C')
     pdf.cell(35, 8, txt="Code", border=1, ln=0, align='C')
@@ -331,7 +345,7 @@ def CreateFacture():
     if pdf.get_y() > 230:  # Si pas assez de place pour les totaux
         pdf.add_page()
     
-    # Totaux (ajustés aux nouvelles largeurs)
+    # Totaux
     pdf.set_font("Arial", "B", size=10)
     
     pdf.cell(170, 8, txt="Total HT", border=1, ln=0, align='C')
@@ -373,19 +387,21 @@ def CreateFacture():
             "prix_unitaire": produit['prix_unitaire'],
             "total": produit['total']
         })
+    
     try:
         ventes_df = pd.read_excel(ventes_path)
     except Exception:
         ventes_df = pd.DataFrame(columns=["id_facture", "date", "code_produit", "libelle", "quantite", "prix_unitaire", "total"])
+    
     ventes_df = pd.concat([ventes_df, pd.DataFrame(ventes_lignes)], ignore_index=True)
     ventes_df.to_excel(ventes_path, index=False)
 
-    print(f"\nFacture générée avec succès !")
-    print(f"Fichier : {filename}")
-    print(f"Montant TTC : {total_ttc:,.0f} FCFA")
-    print(f"Nombre de produits : {nb_produits}")
+    print(f"\n✅ Facture générée avec succès !")
+    print(f"📄 Fichier : {filename}")
+    print(f"💰 Montant TTC : {total_ttc:,.0f} FCFA")
+    print(f"📦 Nombre de produits : {nb_produits}")
 
     if taux_reduction > 0:
-        print(f"Remise appliquée : {taux_reduction}%")
+        print(f"🎫 Remise appliquée : {taux_reduction}%")
 
     return filename
