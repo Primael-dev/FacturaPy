@@ -128,11 +128,11 @@ def creer_carte_reduction(code_client, montant_facture):
     
     # Définir les plages de remise
     taux_reduction = 0
-    if montant_facture >= 100000:  # 100 000 FCFA
+    if montant_facture >= 100000: 
         taux_reduction = 10
-    elif montant_facture >= 50000:   # 50 000 FCFA
+    elif montant_facture >= 50000:   
         taux_reduction = 5
-    elif montant_facture >= 25000:   # 25 000 FCFA
+    elif montant_facture >= 25000:   
         taux_reduction = 3
     
     if taux_reduction > 0:
@@ -308,7 +308,7 @@ def CreateFacture():
     # Afficher tous les produits
     for i, produit in enumerate(produits_facture, 1):
         # Vérifier si on doit créer une nouvelle page
-        if pdf.get_y() > 250:  # Si on approche du bas de page
+        if pdf.get_y() > 250:  
             pdf.add_page()
             creer_entete_tableau()
         
@@ -328,7 +328,7 @@ def CreateFacture():
     
     # Calculer le nombre de lignes vides nécessaires
     nb_produits = len(produits_facture)
-    nb_lignes_min = 4  # Minimum 4 lignes pour un tableau propre
+    nb_lignes_min = 4  
     
     # Ajouter des lignes vides SEULEMENT s'il y a moins de 4 produits
     if nb_produits < nb_lignes_min:
@@ -342,7 +342,7 @@ def CreateFacture():
             pdf.cell(30, 8, txt="", border=1, ln=1, align='C')
     
     # Vérifier si on a assez de place pour les totaux
-    if pdf.get_y() > 230:  # Si pas assez de place pour les totaux
+    if pdf.get_y() > 230:  
         pdf.add_page()
     
     # Totaux
